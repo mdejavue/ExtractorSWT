@@ -1,9 +1,10 @@
 package de.s9mtmeis.thesis.swt;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
+import java.text.DecimalFormat;
 
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
@@ -18,6 +19,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
@@ -53,6 +55,7 @@ public class Start {
 	private Text text_6;
 	private Text txtJobflowId;
 	private Display display;
+	private Text txtSpecificInput;
 
 	/**
 	 * Launch the application.
@@ -154,26 +157,99 @@ public class Start {
 		lblMessageText.setBounds(75, 5, 59, 14);
 		lblMessageText.setText("...");
 		
+		Label lblFile = new Label(grpValidateOutput, SWT.NONE);
+		lblFile.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		lblFile.setBounds(20, 45, 45, 14);
+		lblFile.setText("Input:");
+		
+		Label lblSize = new Label(grpValidateOutput, SWT.NONE);
+		lblSize.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		lblSize.setBounds(20, 64, 45, 14);
+		lblSize.setText("Size:");
+		
+		final Label lblNone = new Label(grpValidateOutput, SWT.NONE);
+		lblNone.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		lblNone.setBounds(81, 45, 170, 14);
+		lblNone.setText("None");
+		
+		final Label lblNa = new Label(grpValidateOutput, SWT.NONE);
+		lblNa.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		lblNa.setBounds(81, 64, 180, 14);
+		lblNa.setText("n/a");
+		
+		Label lblNewLabel = new Label(grpValidateOutput, SWT.NONE);
+		lblNewLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		lblNewLabel.setBounds(20, 127, 45, 14);
+		lblNewLabel.setText("Output:");
+		
+		final Label lblNewLabel_1 = new Label(grpValidateOutput, SWT.NONE);
+		lblNewLabel_1.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		lblNewLabel_1.setBounds(81, 127, 170, 14);
+		lblNewLabel_1.setText("None");
 		
 		Button btnChooseOutputFile = new Button(grpValidateOutput, SWT.NONE);
+		btnChooseOutputFile.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fd = new FileDialog(shlCommoncrawlUi, SWT.OPEN);
+		        fd.setText("Open");
+		        fd.setFilterPath(null);
+		        String[] filterExt = { "*.*" };
+		        fd.setFilterExtensions(filterExt);
+		        String selected = fd.open();
+		        
+		        File inputFile = new File(selected);
+		        lblNone.setText(inputFile.getName());
+		        DecimalFormat df = new DecimalFormat("#.##");
+		        lblNa.setText(df.format(inputFile.length() / (1024.0 * 1024.0)) + " MByte");
+		        
+			}
+		});
 		btnChooseOutputFile.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnChooseOutputFile.setBounds(10, 10, 162, 28);
-		btnChooseOutputFile.setText("Choose Output File");
+		btnChooseOutputFile.setBounds(10, 10, 182, 28);
+		btnChooseOutputFile.setText("Choose File from Disk");
 		
 		Button btnValidateWithRapper = new Button(grpValidateOutput, SWT.NONE);
 		btnValidateWithRapper.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnValidateWithRapper.setBounds(10, 55, 162, 28);
+		btnValidateWithRapper.setBounds(10, 174, 162, 28);
 		btnValidateWithRapper.setText("Validate with Rapper");
 		
 		Button btnRemoveTriples = new Button(grpValidateOutput, SWT.NONE);
+		btnRemoveTriples.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(),
+			            "", "Seperate Patterns with Semicolon (;)", "!.css; /product; /offer; #offer; /review", null);
+			        if (dlg.open() == Window.OK) {
+
+			        }
+			}
+		});
 		btnRemoveTriples.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnRemoveTriples.setBounds(10, 160, 162, 28);
+		btnRemoveTriples.setBounds(10, 203, 162, 28);
 		btnRemoveTriples.setText("Remove Triples");
 		
-		Button button_7 = new Button(grpValidateOutput, SWT.NONE);
-		button_7.setBounds(10, 131, 112, 28);
-		button_7.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		button_7.setText("Set Filters");
+		
+		
+		Button btnNewButton = new Button(grpValidateOutput, SWT.NONE);
+		btnNewButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fd = new FileDialog(shlCommoncrawlUi, SWT.SAVE);
+		        fd.setText("Save");
+		        fd.setFilterPath(null);
+		        String[] filterExt = { "*.nt" };
+		        fd.setFilterExtensions(filterExt);
+		        String selected = fd.open();
+		        File outputFile = new File(selected);
+		        lblNewLabel_1.setText(outputFile.getName());
+			}
+		});
+		btnNewButton.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		btnNewButton.setBounds(10, 93, 182, 28);
+		btnNewButton.setText("Choose File Destination");
+		
+		
 		
 		final Button btnSetupCluster = new Button(grpEnableModules, SWT.CHECK);
 		btnSetupCluster.setBounds(30, 27, 128, 18);
@@ -387,8 +463,8 @@ public class Start {
 				       .withHadoopJarStep(new HadoopJarStepConfig()
 				       		.withJar(txtJarUri.getText())
 				   			.withMainClass(txtMainClass.getText())
-				   			.withArgs(	"inputPath=" +
-				   						"outputPath=" + txtOutputUri));
+				   			.withArgs(	"inputPath=" + txtSpecificInput.getText() +
+				   						"outputPath=" + txtOutputUri.getText()));
 				
 				   AddJobFlowStepsRequest request = new AddJobFlowStepsRequest()
 				   											.withJobFlowId(txtJobflowId.getText())
@@ -436,22 +512,34 @@ public class Start {
 		});
 		button_6.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		button_6.setText("Set Matchers");
-		button_6.setBounds(10, 157, 139, 28);
+		button_6.setBounds(10, 119, 139, 28);
 		
 		text_6 = new Text(grpConfigureStep, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		text_6.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		text_6.setText("Extra Parameters");
-		text_6.setBounds(10, 194, 230, 72);
+		text_6.setBounds(10, 156, 230, 72);
 		
-		Button button_9 = new Button(grpConfigureStep, SWT.RADIO);
+		final Button button_9 = new Button(grpConfigureStep, SWT.RADIO);
+		button_9.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (button_9.getSelection()) {
+					txtSpecificInput.setVisible(true);
+				}
+				else
+				{
+					txtSpecificInput.setVisible(false);
+				}
+			}
+		});
 		button_9.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		button_9.setText("Specific Crawl");
-		button_9.setBounds(10, 272, 117, 18);
+		button_9.setBounds(10, 234, 117, 18);
 		
 		Button button_10 = new Button(grpConfigureStep, SWT.RADIO);
 		button_10.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		button_10.setText("Random");
-		button_10.setBounds(128, 272, 75, 18);
+		button_10.setBounds(133, 234, 88, 18);
 		
 		txtJobflowId = new Text(grpConfigureStep, SWT.BORDER);
 		txtJobflowId.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
@@ -470,8 +558,14 @@ public class Start {
 			}
 		});
 		btnSelectExtractors.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnSelectExtractors.setBounds(10, 127, 139, 28);
+		btnSelectExtractors.setBounds(10, 95, 139, 28);
 		btnSelectExtractors.setText("Set Extractors");
+		
+		txtSpecificInput = new Text(grpConfigureStep, SWT.BORDER);
+		txtSpecificInput.setText("s3n://input/path");
+		txtSpecificInput.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		txtSpecificInput.setBounds(10, 262, 230, 19);
+		txtSpecificInput.setVisible(false);
 		
 		btnCreateCluster.addSelectionListener(new SelectionAdapter() {
 			@Override
