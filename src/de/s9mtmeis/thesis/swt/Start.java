@@ -2,6 +2,7 @@ package de.s9mtmeis.thesis.swt;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
@@ -56,6 +57,8 @@ public class Start {
 	private Text txtJobflowId;
 	private Display display;
 	private Text txtSpecificInput;
+	private String valInputFile;
+	private String valOutputFile;
 
 	/**
 	 * Launch the application.
@@ -196,9 +199,9 @@ public class Start {
 		        fd.setFilterPath(null);
 		        String[] filterExt = { "*.*" };
 		        fd.setFilterExtensions(filterExt);
-		        String selected = fd.open();
+		        valInputFile = fd.open();
 		        
-		        File inputFile = new File(selected);
+		        File inputFile = new File(valInputFile);
 		        lblNone.setText(inputFile.getName());
 		        DecimalFormat df = new DecimalFormat("#.##");
 		        lblNa.setText(df.format(inputFile.length() / (1024.0 * 1024.0)) + " MByte");
@@ -210,6 +213,22 @@ public class Start {
 		btnChooseOutputFile.setText("Choose File from Disk");
 		
 		Button btnValidateWithRapper = new Button(grpValidateOutput, SWT.NONE);
+		btnValidateWithRapper.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					String[] cmd = {
+							"/bin/sh",
+							"-c",
+							"/usr/local/bin/rapper -i ntriples -r " + valInputFile + " > " + valOutputFile,
+							};					
+					Runtime.getRuntime().exec(cmd);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		btnValidateWithRapper.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		btnValidateWithRapper.setBounds(10, 174, 162, 28);
 		btnValidateWithRapper.setText("Validate with Rapper");
@@ -221,13 +240,57 @@ public class Start {
 				InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(),
 			            "", "Seperate Patterns with Semicolon (;)", "!.css; /product; /offer; #offer; /review", null);
 			        if (dlg.open() == Window.OK) {
-
+			        	
+			        	String[] values = dlg.getValue().split(";");
+			        	String negatives = "(";
+			        	String positives = "(";
+			        	
+			        	for ( String s : values )
+			        	{
+			        		s = s.trim();
+			        		if (s.startsWith("!"))
+			        		{
+			        			negatives += s.substring(1) + "|" ;
+			        		}
+			        		else
+			        		{
+			        			positives += s + "|";
+			        		}
+			        	}
+			        	
+			        	negatives = negatives.substring(0,negatives.length()-1) + ")";
+			        	positives = positives.substring(0,positives.length()-1) + ")";
+			        	
+				        String[] cmd1 = {
+									"/bin/sh",
+									"-c",
+									"grep -v " + negatives + " > " + valOutputFile + "_cleaned",
+									};	
+				        
+				        String[] cmd2 = {
+									"/bin/sh",
+									"-c",
+									"grep " + positives + " > " + valOutputFile + "_cleaned" ,
+									};	
+				        
+							try {
+								if (negatives.length() > 1) {
+									Runtime.getRuntime().exec(cmd1).waitFor();
+								}
+								
+								if (positives.length() > 1) {
+									Runtime.getRuntime().exec(cmd2);
+								}
+							
+							} catch (Exception e1) {
+								e1.printStackTrace();
+							}
 			        }
 			}
 		});
 		btnRemoveTriples.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		btnRemoveTriples.setBounds(10, 203, 162, 28);
-		btnRemoveTriples.setText("Remove Triples");
+		btnRemoveTriples.setText("Clean-Up Triples");
 		
 		
 		
@@ -240,8 +303,9 @@ public class Start {
 		        fd.setFilterPath(null);
 		        String[] filterExt = { "*.nt" };
 		        fd.setFilterExtensions(filterExt);
-		        String selected = fd.open();
-		        File outputFile = new File(selected);
+		        
+		        valOutputFile = fd.open();
+		        File outputFile = new File(valOutputFile);
 		        lblNewLabel_1.setText(outputFile.getName());
 			}
 		});
