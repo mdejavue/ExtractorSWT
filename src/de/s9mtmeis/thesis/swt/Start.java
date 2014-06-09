@@ -59,6 +59,7 @@ public class Start {
 	private Text txtSpecificInput;
 	private String valInputFile;
 	private String valOutputFile;
+	private String matchersString;
 
 	/**
 	 * Launch the application.
@@ -528,7 +529,9 @@ public class Start {
 				       		.withJar(txtJarUri.getText())
 				   			.withMainClass(txtMainClass.getText())
 				   			.withArgs(	"inputPath=" + txtSpecificInput.getText() +
-				   						"outputPath=" + txtOutputUri.getText()));
+				   						"outputPath=" + txtOutputUri.getText() +
+				   						"matchers=" + matchersString)); // +
+				   						//"extractors=" + ""));
 				
 				   AddJobFlowStepsRequest request = new AddJobFlowStepsRequest()
 				   											.withJobFlowId(txtJobflowId.getText())
@@ -568,9 +571,19 @@ public class Start {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(),
-			            "", "Seperate Matchers with Semicolon (;)", "xyz", null);
+			            "", "Seperate Matchers with Semicolon (;)", "xyz; !abc", null);
 			        if (dlg.open() == Window.OK) {
+			        	
+			        	String tmpString = "";
 
+			        	String[] values = dlg.getValue().split(";");
+			        	
+			        	for ( String s : values ) {
+			        		s = s.trim();
+			        		tmpString = tmpString + " ;; " + s ;
+			        	}
+			        	
+			        	matchersString = tmpString.substring(4);
 			        }
 			}
 		});
@@ -615,7 +628,7 @@ public class Start {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(),
-			            "", "Seperate Extractors with Semicolon (;)", "html-rdfa", null);
+			            "", "Seperate Extractors with Semicolon (;)", "html-rdfa11; html-microdata; html-mf-hproduct" , null);
 			        if (dlg.open() == Window.OK) {
 
 			        }
