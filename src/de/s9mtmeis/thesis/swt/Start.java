@@ -60,6 +60,7 @@ public class Start {
 	private String valInputFile;
 	private String valOutputFile;
 	private String matchersString;
+	private String extractorsString;
 
 	/**
 	 * Launch the application.
@@ -528,14 +529,16 @@ public class Start {
 				       .withHadoopJarStep(new HadoopJarStepConfig()
 				       		.withJar(txtJarUri.getText())
 				   			.withMainClass(txtMainClass.getText())
-				   			.withArgs(	"inputPath=" + txtSpecificInput.getText() +
-				   						"outputPath=" + txtOutputUri.getText() +
-				   						"matchers=" + matchersString)); // +
-				   						//"extractors=" + ""));
+				   			.withArgs("inputPath=" + txtSpecificInput.getText(),
+				   					  "outputPath=" + txtOutputUri.getText(),
+				   					  "matchers=" + matchersString,
+				   					  "extractors=" + extractorsString));
 				
 				   AddJobFlowStepsRequest request = new AddJobFlowStepsRequest()
 				   											.withJobFlowId(txtJobflowId.getText())
 				   											.withSteps(customStep);
+				   
+				   System.out.println(request.toString());
 				   
 				   emr.addJobFlowSteps(request);
 				   }
@@ -571,7 +574,7 @@ public class Start {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(),
-			            "", "Seperate Matchers with Semicolon (;)", "xyz; !abc", null);
+			            "", "Seperate Matchers with Semicolon (;)", "(property|typeof|about|resource)\\s*=; (itemscope|itemprop\\s*=); hproduct", null);
 			        if (dlg.open() == Window.OK) {
 			        	
 			        	String tmpString = "";
@@ -631,6 +634,16 @@ public class Start {
 			            "", "Seperate Extractors with Semicolon (;)", "html-rdfa11; html-microdata; html-mf-hproduct" , null);
 			        if (dlg.open() == Window.OK) {
 
+			        	String tmpString = "";
+
+			        	String[] values = dlg.getValue().split(";");
+			        	
+			        	for ( String s : values ) {
+			        		s = s.trim();
+			        		tmpString = tmpString + " ;; " + s ;
+			        	}
+			        	
+			        	extractorsString = tmpString.substring(4);
 			        }
 			}
 		});
