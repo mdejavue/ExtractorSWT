@@ -1,5 +1,6 @@
 package de.s9mtmeis.thesis.swt;
 
+
 import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
@@ -68,6 +69,9 @@ public class Start {
 	private String valOutputFile;
 	private String matchersString;
 	private String extractorsString;
+	private Combo cmbMasterType;
+	private Combo cmbSlaveType;
+	private Spinner spnNumInstances;
 
 	/**
 	 * Launch the application.
@@ -497,19 +501,19 @@ public class Start {
 		txtClusterName.setText("MySimpleCrawl");
 		txtClusterName.setBounds(10, 37, 244, 19);
 		
-		final Combo cmbMasterType = new Combo(grpSetupCluster, SWT.READ_ONLY);
+		cmbMasterType = new Combo(grpSetupCluster, SWT.READ_ONLY);
 		cmbMasterType.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		cmbMasterType.setItems(new String[] {"Master Type", "m1.small", "m1.medium", "m1.large", "m1.xlarge"});
 		cmbMasterType.setBounds(10, 62, 119, 22);
 		cmbMasterType.select(0);
 		
-		final Combo cmbSlaveType = new Combo(grpSetupCluster, SWT.READ_ONLY);
+		cmbSlaveType = new Combo(grpSetupCluster, SWT.READ_ONLY);
 		cmbSlaveType.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		cmbSlaveType.setItems(new String[] {"Slave Type", "m1.small", "m1.medium", "m1.large", "m1.xlarge"});
 		cmbSlaveType.setBounds(135, 62, 119, 22);
 		cmbSlaveType.select(0);
 		
-		final Spinner spnNumInstances = new Spinner(grpSetupCluster, SWT.BORDER);
+		spnNumInstances = new Spinner(grpSetupCluster, SWT.BORDER);
 		spnNumInstances.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		spnNumInstances.setBounds(167, 89, 87, 22);
 		
@@ -573,8 +577,8 @@ public class Start {
 				   			.withMainClass(txtMainClass.getText())
 				   			.withArgs("inputPath=" + txtSpecificInput.getText(),
 				   					  "outputPath=" + txtOutputUri.getText(),
-				   					  "matchers=" + matchersString,
-				   					  "extractors=" + extractorsString));
+				   					  "matchers=" + formatSplitInputArg(matchersString),
+				   					  "extractors=" + formatSplitInputArg(extractorsString)));
 				
 				   AddJobFlowStepsRequest request = new AddJobFlowStepsRequest()
 				   											.withJobFlowId(txtJobflowId.getText())
@@ -616,19 +620,9 @@ public class Start {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(),
-			            "", "Seperate Matchers with Semicolon (;)", "(property|typeof|about|resource)\\s*=; (itemscope|itemprop\\s*=); hproduct", null);
-			        if (dlg.open() == Window.OK) {
-			        	
-			        	String tmpString = "";
-
-			        	String[] values = dlg.getValue().split(";");
-			        	
-			        	for ( String s : values ) {
-			        		s = s.trim();
-			        		tmpString = tmpString + " ;; " + s ;
-			        	}
-			        	
-			        	matchersString = tmpString.substring(4);
+			            "", "Seperate Matchers with Semicolon (;)", matchersString, null);
+			        if (dlg.open() == Window.OK) {			        	
+			        	matchersString = (dlg.getValue());
 			        }
 			}
 		});
@@ -668,19 +662,10 @@ public class Start {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(),
-			            "", "Seperate Extractors with Semicolon (;)", "html-rdfa11; html-microdata; html-mf-hproduct" , null);
+			            "", "Seperate Extractors with Semicolon (;)", extractorsString , null);
 			        if (dlg.open() == Window.OK) {
 
-			        	String tmpString = "";
-
-			        	String[] values = dlg.getValue().split(";");
-			        	
-			        	for ( String s : values ) {
-			        		s = s.trim();
-			        		tmpString = tmpString + " ;; " + s ;
-			        	}
-			        	
-			        	extractorsString = tmpString.substring(4);
+			        	extractorsString = (dlg.getValue());
 			        }
 			}
 		});
@@ -754,15 +739,15 @@ public class Start {
 	    	writer.println("accessSecret=" + txtSecret.getText());
 	    	writer.println("bucketName=" + txtBucketName.getText());
 	    	writer.println("clusterName=" + txtClusterName.getText());
-	    	writer.println("masterType=" + "na");
-	    	writer.println("slaveType=" + "na");
-	    	writer.println("numInstances=" + "na");
+	    	writer.println("masterType=" + cmbMasterType.getSelectionIndex());
+	    	writer.println("slaveType=" + cmbSlaveType.getSelectionIndex());
+	    	writer.println("numInstances=" + spnNumInstances.getSelection());
 	    	writer.println("logUri=" + txtLogUri.getText());
 	    	writer.println("jarUri=" + txtJarUri.getText());
 	    	writer.println("mainClass=" + txtMainClass.getText());
 	    	writer.println("outputUri=" + txtOutputUri.getText());
-	    	writer.println("extractors=" + "na");
-	    	writer.println("matchers=" + "na");
+	    	writer.println("extractors=" + extractorsString);
+	    	writer.println("matchers=" + matchersString);
 	    	writer.println("inputUri=" + txtSpecificInput.getText());
 	    	writer.println("jobflowId=" + txtJobflowId.getText());
 	    	writer.close();
@@ -778,15 +763,13 @@ public class Start {
 		controls.put("accessSecret", txtSecret);
 		controls.put("bucketName", txtBucketName);
 		controls.put("clusterName", txtClusterName);
-		controls.put("masterType", null);
-		controls.put("slaveType", null);	
-		controls.put("numInstances", null);
+		controls.put("masterType", cmbMasterType);
+		controls.put("slaveType", cmbSlaveType);	
+		controls.put("numInstances", spnNumInstances);
 		controls.put("logUri", txtLogUri);
 		controls.put("jarUri", txtJarUri);
 		controls.put("mainClass", txtMainClass);
 		controls.put("outputUri", txtOutputUri);
-		controls.put("extractors", null);
-		controls.put("matchers", null);
 		controls.put("inputUri", txtSpecificInput);
 		controls.put("jobflowId", txtJobflowId);
 				
@@ -795,11 +778,23 @@ public class Start {
 			br = new BufferedReader(new FileReader("moderator.settings"));
 			String line;
 			while ((line = br.readLine()) != null) {
-				  String[] split = line.split("=");
+				  String[] split = line.split("=",2);
 				  Control c = controls.get(split[0]);
-				  if (c != null) {
+				  if (split[0].equals("extractors")) {
+						extractorsString = split[1];	
+				  }
+				  else if (split[0].equals("matchers")) {
+						matchersString = split[1];	
+				  }
+				  else if (c != null) {					
 					if ( c instanceof Text ) {
 						((Text)c).setText(split[1]);
+					}
+					else if (c instanceof Combo) {
+						((Combo)c).select(Integer.parseInt(split[1]));
+					}
+					else if (c instanceof Spinner) {
+						((Spinner)c).setSelection(Integer.parseInt(split[1]));
 					}
 				  }
 				}
@@ -807,6 +802,19 @@ public class Start {
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
+	}
+	
+	private String formatSplitInputArg(String input) {
+      	String tmpString = "";
+
+    	String[] values = input.split(";");
+    	
+    	for ( String s : values ) {
+    		s = s.trim();
+    		tmpString = tmpString + " ;; " + s ;
+    	}
+    	
+    	return tmpString.substring(4);
 	}
 	
 	public static void openWebpage(URI uri) {
