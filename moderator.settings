@@ -1,0 +1,7 @@
+accessToken=123123
+accessSecret=Secret
+clusterName=MySimpleCrawl
+masterType=na
+slaveType=na
+numInstances=na
+logUri=s3n://mybucket/emr/logs

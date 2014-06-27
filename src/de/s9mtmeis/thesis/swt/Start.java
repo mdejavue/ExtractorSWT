@@ -2,7 +2,10 @@ package de.s9mtmeis.thesis.swt;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
@@ -20,9 +23,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -41,6 +46,7 @@ import com.amazonaws.services.elasticmapreduce.model.StepConfig;
 import com.amazonaws.services.elasticmapreduce.util.StepFactory;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
+
 import org.eclipse.swt.widgets.ProgressBar;
 
 public class Start {
@@ -87,6 +93,35 @@ public class Start {
 		createContents();
 		shlCommoncrawlUi.open();
 		shlCommoncrawlUi.layout();
+		shlCommoncrawlUi.addListener(SWT.Close, new Listener() {
+		      public void handleEvent(Event event) 	 {	    	
+		    	// saving your data
+		    	PrintWriter writer;
+				try {
+					writer = new PrintWriter("moderator.settings", "UTF-8");
+			    	writer.println("accessToken=" + txtAccessToken.getText());
+			    	writer.println("accessSecret=" + txtSecret.getText());
+			    	writer.println("bucketName=" + txtBucketName.getText());
+			    	writer.println("clusterName=" + txtClusterName.getText());
+			    	writer.println("masterType=" + "na");
+			    	writer.println("slaveType=" + "na");
+			    	writer.println("numInstances=" + "na");
+			    	writer.println("logUri=" + txtLogUri.getText());
+			    	writer.println("jarUri=" + txtJarUri.getText());
+			    	writer.println("mainClass=" + txtMainClass.getText());
+			    	writer.println("outputUri=" + txtOutputUri.getText());
+			    	writer.println("extractors=" + "na");
+			    	writer.println("matchers=" + "na");
+			    	writer.println("inputUri=" + txtSpecificInput.getText());
+			    	writer.println("jobflowId=" + txtJobflowId.getText());
+			    	writer.close();
+				} catch (FileNotFoundException | UnsupportedEncodingException e) {
+					e.printStackTrace();
+				} 
+
+		        event.doit = true;
+		      }
+		    });
 		while (!shlCommoncrawlUi.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -461,7 +496,7 @@ public class Start {
 		
 		btnCreateCluster.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		btnCreateCluster.setText("Create Cluster/Jobflow");
-		btnCreateCluster.setBounds(10, 232, 238, 28);
+		btnCreateCluster.setBounds(10, 282, 238, 28);
 		
 		Button btnGotoClusterList = new Button(grpSetupCluster, SWT.NONE);
 		btnGotoClusterList.addSelectionListener(new SelectionAdapter() {

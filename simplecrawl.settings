@@ -1,9 +1,0 @@
-accessToken=Access token
-accessSecret=Secret
-clusterName=Cluster name
-masterType=0
-slaveType=0
-numInstances=0
-logUri=LogURI
-customHadoopVersion=false
-customParameters=Custom Parameters
