@@ -1,14 +1,16 @@
 package de.s9mtmeis.thesis.swt;
 
 import java.awt.Desktop;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
@@ -29,6 +31,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -46,8 +49,6 @@ import com.amazonaws.services.elasticmapreduce.model.StepConfig;
 import com.amazonaws.services.elasticmapreduce.util.StepFactory;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
-
-import org.eclipse.swt.widgets.ProgressBar;
 
 public class Start {
 
@@ -95,30 +96,7 @@ public class Start {
 		shlCommoncrawlUi.layout();
 		shlCommoncrawlUi.addListener(SWT.Close, new Listener() {
 		      public void handleEvent(Event event) 	 {	    	
-		    	// saving your data
-		    	PrintWriter writer;
-				try {
-					writer = new PrintWriter("moderator.settings", "UTF-8");
-			    	writer.println("accessToken=" + txtAccessToken.getText());
-			    	writer.println("accessSecret=" + txtSecret.getText());
-			    	writer.println("bucketName=" + txtBucketName.getText());
-			    	writer.println("clusterName=" + txtClusterName.getText());
-			    	writer.println("masterType=" + "na");
-			    	writer.println("slaveType=" + "na");
-			    	writer.println("numInstances=" + "na");
-			    	writer.println("logUri=" + txtLogUri.getText());
-			    	writer.println("jarUri=" + txtJarUri.getText());
-			    	writer.println("mainClass=" + txtMainClass.getText());
-			    	writer.println("outputUri=" + txtOutputUri.getText());
-			    	writer.println("extractors=" + "na");
-			    	writer.println("matchers=" + "na");
-			    	writer.println("inputUri=" + txtSpecificInput.getText());
-			    	writer.println("jobflowId=" + txtJobflowId.getText());
-			    	writer.close();
-				} catch (FileNotFoundException | UnsupportedEncodingException e) {
-					e.printStackTrace();
-				} 
-
+		    	saveSettings();
 		        event.doit = true;
 		      }
 		    });
@@ -757,12 +735,78 @@ public class Start {
 		Label lblMessages = new Label(group, SWT.NONE);
 		lblMessages.setBounds(10, 5, 59, 14);
 		lblMessages.setText("Messages:");
-
-
+		
+		
+		loadSettings();
+		
 	}
 
 	protected Display getDisplay() {
 		return display;
+	}
+	
+	private void saveSettings() {
+		// saving your data
+    	PrintWriter writer;
+		try {
+			writer = new PrintWriter("moderator.settings", "UTF-8");
+	    	writer.println("accessToken=" + txtAccessToken.getText());
+	    	writer.println("accessSecret=" + txtSecret.getText());
+	    	writer.println("bucketName=" + txtBucketName.getText());
+	    	writer.println("clusterName=" + txtClusterName.getText());
+	    	writer.println("masterType=" + "na");
+	    	writer.println("slaveType=" + "na");
+	    	writer.println("numInstances=" + "na");
+	    	writer.println("logUri=" + txtLogUri.getText());
+	    	writer.println("jarUri=" + txtJarUri.getText());
+	    	writer.println("mainClass=" + txtMainClass.getText());
+	    	writer.println("outputUri=" + txtOutputUri.getText());
+	    	writer.println("extractors=" + "na");
+	    	writer.println("matchers=" + "na");
+	    	writer.println("inputUri=" + txtSpecificInput.getText());
+	    	writer.println("jobflowId=" + txtJobflowId.getText());
+	    	writer.close();
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} 
+	}
+	
+	private void loadSettings() {
+		
+		HashMap<String, Control> controls = new HashMap<String, Control>();
+		controls.put("accessToken", txtAccessToken);
+		controls.put("accessSecret", txtSecret);
+		controls.put("bucketName", txtBucketName);
+		controls.put("clusterName", txtClusterName);
+		controls.put("masterType", null);
+		controls.put("slaveType", null);	
+		controls.put("numInstances", null);
+		controls.put("logUri", txtLogUri);
+		controls.put("jarUri", txtJarUri);
+		controls.put("mainClass", txtMainClass);
+		controls.put("outputUri", txtOutputUri);
+		controls.put("extractors", null);
+		controls.put("matchers", null);
+		controls.put("inputUri", txtSpecificInput);
+		controls.put("jobflowId", txtJobflowId);
+				
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new FileReader("moderator.settings"));
+			String line;
+			while ((line = br.readLine()) != null) {
+				  String[] split = line.split("=");
+				  Control c = controls.get(split[0]);
+				  if (c != null) {
+					if ( c instanceof Text ) {
+						((Text)c).setText(split[1]);
+					}
+				  }
+				}
+				br.close();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 	public static void openWebpage(URI uri) {
