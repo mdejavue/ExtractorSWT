@@ -41,6 +41,7 @@ import com.amazonaws.services.elasticmapreduce.model.StepConfig;
 import com.amazonaws.services.elasticmapreduce.util.StepFactory;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
+import org.eclipse.swt.widgets.ProgressBar;
 
 public class Start {
 
@@ -53,7 +54,6 @@ public class Start {
 	private Text txtJarUri;
 	private Text txtMainClass;
 	private Text txtOutputUri;
-	private Text text_6;
 	private Text txtJobflowId;
 	private Display display;
 	private Text txtSpecificInput;
@@ -159,7 +159,7 @@ public class Start {
 		group.setLayoutData(new RowData(784, 16));
 		
 		final Label lblMessageText = new Label(group, SWT.NONE);
-		lblMessageText.setBounds(75, 5, 59, 14);
+		lblMessageText.setBounds(75, 5, 540, 14);
 		lblMessageText.setText("...");
 		
 		Label lblFile = new Label(grpValidateOutput, SWT.NONE);
@@ -211,7 +211,7 @@ public class Start {
 			}
 		});
 		btnChooseOutputFile.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnChooseOutputFile.setBounds(10, 10, 182, 28);
+		btnChooseOutputFile.setBounds(10, 10, 231, 28);
 		btnChooseOutputFile.setText("Choose File from Disk");
 		
 		Button btnValidateWithRapper = new Button(grpValidateOutput, SWT.NONE);
@@ -232,8 +232,8 @@ public class Start {
 			}
 		});
 		btnValidateWithRapper.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnValidateWithRapper.setBounds(10, 174, 162, 28);
-		btnValidateWithRapper.setText("Validate with Rapper");
+		btnValidateWithRapper.setBounds(10, 275, 231, 28);
+		btnValidateWithRapper.setText("Start");
 		
 		Button btnRemoveTriples = new Button(grpValidateOutput, SWT.NONE);
 		btnRemoveTriples.addSelectionListener(new SelectionAdapter() {
@@ -291,8 +291,8 @@ public class Start {
 			}
 		});
 		btnRemoveTriples.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnRemoveTriples.setBounds(10, 203, 162, 28);
-		btnRemoveTriples.setText("Clean-Up Triples");
+		btnRemoveTriples.setBounds(158, 207, 34, 28);
+		btnRemoveTriples.setText("...");
 		
 		
 		
@@ -312,8 +312,37 @@ public class Start {
 			}
 		});
 		btnNewButton.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnNewButton.setBounds(10, 93, 182, 28);
+		btnNewButton.setBounds(10, 93, 231, 28);
 		btnNewButton.setText("Choose File Destination");
+		
+		Button btnAddTimestamps = new Button(grpValidateOutput, SWT.CHECK);
+		btnAddTimestamps.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		btnAddTimestamps.setBounds(20, 166, 172, 18);
+		btnAddTimestamps.setText("Add Timestamps");
+		
+		Button btnAddUrls = new Button(grpValidateOutput, SWT.CHECK);
+		btnAddUrls.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		btnAddUrls.setText("Add URLs");
+		btnAddUrls.setBounds(20, 190, 172, 18);
+		
+		Button btnCleanupTriples = new Button(grpValidateOutput, SWT.CHECK);
+		btnCleanupTriples.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		btnCleanupTriples.setText("Clean-up Triples");
+		btnCleanupTriples.setBounds(20, 211, 132, 18);
+		
+		Button btnValidate = new Button(grpValidateOutput, SWT.CHECK);
+		btnValidate.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		btnValidate.setText("Validate");
+		btnValidate.setBounds(20, 235, 172, 18);
+		
+		ProgressBar progressBar = new ProgressBar(grpValidateOutput, SWT.NONE);
+		progressBar.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		progressBar.setBounds(20, 309, 208, 28);
+		
+		Button btnUpload = new Button(grpValidateOutput, SWT.NONE);
+		btnUpload.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		btnUpload.setBounds(10, 343, 231, 28);
+		btnUpload.setText("Upload");
 		
 		
 		
@@ -592,12 +621,7 @@ public class Start {
 		});
 		button_6.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		button_6.setText("Set Matchers");
-		button_6.setBounds(10, 119, 139, 28);
-		
-		text_6 = new Text(grpConfigureStep, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-		text_6.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		text_6.setText("Extra Parameters");
-		text_6.setBounds(10, 156, 230, 72);
+		button_6.setBounds(10, 174, 139, 28);
 		
 		final Button button_9 = new Button(grpConfigureStep, SWT.RADIO);
 		button_9.addSelectionListener(new SelectionAdapter() {
@@ -648,7 +672,7 @@ public class Start {
 			}
 		});
 		btnSelectExtractors.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnSelectExtractors.setBounds(10, 95, 139, 28);
+		btnSelectExtractors.setBounds(10, 140, 139, 28);
 		btnSelectExtractors.setText("Set Extractors");
 		
 		txtSpecificInput = new Text(grpConfigureStep, SWT.BORDER);
