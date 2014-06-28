@@ -69,9 +69,15 @@ public class Start {
 	private String valOutputFile;
 	private String matchersString;
 	private String extractorsString;
+	private String cleanupString;
 	private Combo cmbMasterType;
 	private Combo cmbSlaveType;
 	private Spinner spnNumInstances;
+	private Button btnAddTimestamps;
+	private Button btnAddUrls;
+	private Button btnCleanupTriples;
+	private Button btnValidate;
+	private Label lblMessageText;
 
 	/**
 	 * Launch the application.
@@ -175,8 +181,8 @@ public class Start {
 		Group group = new Group(shlCommoncrawlUi, SWT.NONE);
 		group.setLayoutData(new RowData(784, 16));
 		
-		final Label lblMessageText = new Label(group, SWT.NONE);
-		lblMessageText.setBounds(75, 5, 540, 14);
+		lblMessageText = new Label(group, SWT.NONE);
+		lblMessageText.setBounds(102, 5, 540, 14);
 		lblMessageText.setText("...");
 		
 		Label lblFile = new Label(grpValidateOutput, SWT.NONE);
@@ -235,17 +241,7 @@ public class Start {
 		btnValidateWithRapper.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				try {
-					String[] cmd = {
-							"/bin/sh",
-							"-c",
-							"/usr/local/bin/rapper -i ntriples -r " + valInputFile + " > " + valOutputFile,
-							};					
-					Runtime.getRuntime().exec(cmd);
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				startValidation();
 			}
 		});
 		btnValidateWithRapper.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
@@ -257,58 +253,15 @@ public class Start {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(),
-			            "", "Seperate Patterns with Semicolon (;)", "!.css; /product; /offer; #offer; /review", null);
+			            "", "Seperate Patterns with Semicolon (;)", cleanupString, null);
 			        if (dlg.open() == Window.OK) {
 			        	
-			        	String[] values = dlg.getValue().split(";");
-			        	String negatives = "(";
-			        	String positives = "(";
-			        	
-			        	for ( String s : values )
-			        	{
-			        		s = s.trim();
-			        		if (s.startsWith("!"))
-			        		{
-			        			negatives += s.substring(1) + "|" ;
-			        		}
-			        		else
-			        		{
-			        			positives += s + "|";
-			        		}
-			        	}
-			        	
-			        	negatives = negatives.substring(0,negatives.length()-1) + ")";
-			        	positives = positives.substring(0,positives.length()-1) + ")";
-			        	
-				        String[] cmd1 = {
-									"/bin/sh",
-									"-c",
-									"grep -v " + negatives + " > " + valOutputFile + "_cleaned",
-									};	
-				        
-				        String[] cmd2 = {
-									"/bin/sh",
-									"-c",
-									"grep " + positives + " > " + valOutputFile + "_cleaned" ,
-									};	
-				        
-							try {
-								if (negatives.length() > 1) {
-									Runtime.getRuntime().exec(cmd1).waitFor();
-								}
-								
-								if (positives.length() > 1) {
-									Runtime.getRuntime().exec(cmd2);
-								}
-							
-							} catch (Exception e1) {
-								e1.printStackTrace();
-							}
+			        	cleanupString = dlg.getValue();
 			        }
 			}
 		});
 		btnRemoveTriples.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnRemoveTriples.setBounds(158, 207, 34, 28);
+		btnRemoveTriples.setBounds(158, 238, 34, 28);
 		btnRemoveTriples.setText("...");
 		
 		
@@ -332,25 +285,26 @@ public class Start {
 		btnNewButton.setBounds(10, 93, 231, 28);
 		btnNewButton.setText("Choose File Destination");
 		
-		Button btnAddTimestamps = new Button(grpValidateOutput, SWT.CHECK);
+		btnAddTimestamps = new Button(grpValidateOutput, SWT.CHECK);
 		btnAddTimestamps.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		btnAddTimestamps.setBounds(20, 166, 172, 18);
 		btnAddTimestamps.setText("Add Timestamps");
 		
-		Button btnAddUrls = new Button(grpValidateOutput, SWT.CHECK);
+		btnAddUrls = new Button(grpValidateOutput, SWT.CHECK);
 		btnAddUrls.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		btnAddUrls.setText("Add URLs");
 		btnAddUrls.setBounds(20, 190, 172, 18);
 		
-		Button btnCleanupTriples = new Button(grpValidateOutput, SWT.CHECK);
+		btnCleanupTriples = new Button(grpValidateOutput, SWT.CHECK);
 		btnCleanupTriples.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		btnCleanupTriples.setText("Clean-up Triples");
-		btnCleanupTriples.setBounds(20, 211, 132, 18);
+		btnCleanupTriples.setBounds(20, 242, 132, 18);
 		
-		Button btnValidate = new Button(grpValidateOutput, SWT.CHECK);
+		btnValidate = new Button(grpValidateOutput, SWT.CHECK);
+		btnValidate.setSelection(true);
 		btnValidate.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		btnValidate.setText("Validate");
-		btnValidate.setBounds(20, 235, 172, 18);
+		btnValidate.setBounds(20, 214, 172, 18);
 		
 		ProgressBar progressBar = new ProgressBar(grpValidateOutput, SWT.NONE);
 		progressBar.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
@@ -415,6 +369,7 @@ public class Start {
 				if (btnValidateOutput.getSelection()) {
 					grpValidateOutput.setForeground(getDisplay().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 					grpValidateOutput.setEnabled(true);
+					btnValidate.setEnabled(false);
 					for ( Control c : grpValidateOutput.getChildren() )						
 						c.setForeground(getDisplay().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));	
 				}
@@ -718,7 +673,7 @@ public class Start {
 		
 		
 		Label lblMessages = new Label(group, SWT.NONE);
-		lblMessages.setBounds(10, 5, 59, 14);
+		lblMessages.setBounds(10, 5, 72, 14);
 		lblMessages.setText("Messages:");
 		
 		
@@ -750,6 +705,11 @@ public class Start {
 	    	writer.println("matchers=" + matchersString);
 	    	writer.println("inputUri=" + txtSpecificInput.getText());
 	    	writer.println("jobflowId=" + txtJobflowId.getText());
+	    	writer.println("addTimestamps=" + btnAddTimestamps.getSelection());
+	    	writer.println("addUrls=" + btnAddUrls.getSelection());
+	    	writer.println("cleanupTriples=" + btnCleanupTriples.getSelection());
+	    	writer.println("validate=" + btnValidate.getSelection());
+	    	writer.println("cleanupParms=" + cleanupString);
 	    	writer.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -772,7 +732,10 @@ public class Start {
 		controls.put("outputUri", txtOutputUri);
 		controls.put("inputUri", txtSpecificInput);
 		controls.put("jobflowId", txtJobflowId);
-				
+		controls.put("addTimestamps", btnAddTimestamps);
+		controls.put("addUrls", btnAddUrls);
+		controls.put("cleanupTriples", btnCleanupTriples);
+		controls.put("validate", btnValidate);
 		BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader("moderator.settings"));
@@ -786,6 +749,9 @@ public class Start {
 				  else if (split[0].equals("matchers")) {
 						matchersString = split[1];	
 				  }
+				  else if (split[0].equals("cleanupParms")) {
+						cleanupString = split[1];	
+				  }
 				  else if (c != null) {					
 					if ( c instanceof Text ) {
 						((Text)c).setText(split[1]);
@@ -796,9 +762,13 @@ public class Start {
 					else if (c instanceof Spinner) {
 						((Spinner)c).setSelection(Integer.parseInt(split[1]));
 					}
+					else if (c instanceof Button) {
+						((Button)c).setSelection(Boolean.parseBoolean(split[1]));
+					}
 				  }
 				}
 				br.close();
+				lblMessageText.setText("Configuration has been restored from last time of use.");
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -816,6 +786,112 @@ public class Start {
     	
     	return tmpString.substring(4);
 	}
+	
+	private void startValidation() {	
+		
+		doAddMetadata(btnAddTimestamps.getSelection(), btnAddUrls.getSelection());		
+
+		doRapper();		
+		
+		if (btnCleanupTriples.getSelection()) {
+			doCleanup(cleanupString);
+		}
+	}
+	
+	
+	private void doAddMetadata(boolean time, boolean url) {
+		if (!time && !url)
+			return;
+		
+				
+	}
+	
+	private void doRapper() {
+		try {
+			String[] cmd = {
+					"/bin/sh",
+					"-c",
+					"/usr/local/bin/rapper -qe -i ntriples -r " + valInputFile + " > " + valOutputFile
+					};					
+			Runtime.getRuntime().exec(cmd).waitFor();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	private void doCleanup(String parms) {
+		String[] values = parms.split(";");
+    	String negatives = "'";
+    	String positives = "'";
+    	
+    	for ( String s : values )
+    	{
+    		s = s.trim();
+    		if (s.startsWith("!"))
+    		{
+    			negatives += s.substring(1) + "|" ;
+    		}
+    		else
+    		{
+    			positives += s + "|";
+    		}
+    	}
+    	
+    	negatives = negatives.substring(0,negatives.length()-1) + "'";
+    	positives = positives.substring(0,positives.length()-1) + "'";
+    	
+        String[] cmd1 = {
+					"/bin/sh",
+					"-c",
+					"/usr/bin/grep -E " + positives + " " + valOutputFile + " > " + valOutputFile + ".tmp"
+					};	
+        
+        String[] cmd2 = {
+					"/bin/sh",
+					"-c",
+					"/usr/bin/grep -vE " + negatives + " " + valOutputFile + ".tmp" + " > " + valOutputFile
+					};	
+        
+        String[] cmd3 = {
+				"/bin/sh",
+				"-c",
+				"mv " + valOutputFile + " " + valOutputFile + ".tmp"
+				};
+        
+        String[] cmd4 = {
+				"/bin/sh",
+				"-c",
+				"mv " + valOutputFile + ".tmp " + valOutputFile
+				};
+        
+        String[] cmd5 = {
+				"/bin/sh",
+				"-c",
+				"rm " + valOutputFile + ".tmp"
+				};
+        
+			try {
+				if (positives.length() > 1) {
+					Runtime.getRuntime().exec(cmd1).waitFor();
+				}
+				else
+				{
+					Runtime.getRuntime().exec(cmd3).waitFor();
+				}
+				
+				if (negatives.length() > 1) {
+					Runtime.getRuntime().exec(cmd2).waitFor();
+				}else
+				{
+					Runtime.getRuntime().exec(cmd4).waitFor();
+				}
+				
+				Runtime.getRuntime().exec(cmd5).waitFor();
+			
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+    }
 	
 	public static void openWebpage(URI uri) {
 	    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
