@@ -13,8 +13,8 @@ extractors=html-rdfa11; html-microdata; html-mf-hproduct; html-mf-hlisting
 matchers=(property|typeof|about|resource)\s*; (itemscope|itemprop\s*=); hproduct; hlisting
 inputUri=s3n://aws-publicdatasets/common-crawl/crawl-data/CC-MAIN-2014-15/segments/1397609521512.15/warc/CC-MAIN-20140416005201-00001-ip-10-147-4-33.ec2.internal.warc.gz
 jobflowId=j-3G1ZHSUB8QBO7
-addTimestamps=false
-addUrls=false
+addTimestamps=true
+addUrls=true
 cleanupTriples=true
 validate=true
-cleanupParms=!.css; hproduct
+cleanupParms=!.css; !stylesheet; !.aspx

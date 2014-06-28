@@ -802,8 +802,19 @@ public class Start {
 	private void doAddMetadata(boolean time, boolean url) {
 		if (!time && !url)
 			return;
-		
-				
+		else {
+			MetaTriplifier.triplify(valInputFile, valOutputFile, time, url);
+			try {
+				String[] cmd = {
+						"/bin/sh",
+						"-c",
+						"mv " + valOutputFile + ".tmp " + valOutputFile
+						};					
+				Runtime.getRuntime().exec(cmd).waitFor();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}				
 	}
 	
 	private void doRapper() {
@@ -811,9 +822,15 @@ public class Start {
 			String[] cmd = {
 					"/bin/sh",
 					"-c",
-					"/usr/local/bin/rapper -qe -i ntriples -r " + valInputFile + " > " + valOutputFile
-					};					
+					"/usr/local/bin/rapper -qe -i ntriples -r " + valOutputFile + " > " + valOutputFile + ".tmp"
+					};		
+			 String[] cmd2 = {
+					"/bin/sh",
+					"-c",
+					"mv " + valOutputFile + ".tmp " + valOutputFile
+					};
 			Runtime.getRuntime().exec(cmd).waitFor();
+			Runtime.getRuntime().exec(cmd2).waitFor();
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -843,13 +860,13 @@ public class Start {
         String[] cmd1 = {
 					"/bin/sh",
 					"-c",
-					"/usr/bin/grep -E " + positives + " " + valOutputFile + " > " + valOutputFile + ".tmp"
+					"/usr/bin/grep -Ei " + positives + " " + valOutputFile + " > " + valOutputFile + ".tmp"
 					};	
         
         String[] cmd2 = {
 					"/bin/sh",
 					"-c",
-					"/usr/bin/grep -vE " + negatives + " " + valOutputFile + ".tmp" + " > " + valOutputFile
+					"/usr/bin/grep -vEi " + negatives + " " + valOutputFile + ".tmp" + " > " + valOutputFile
 					};	
         
         String[] cmd3 = {
