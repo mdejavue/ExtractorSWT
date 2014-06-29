@@ -78,6 +78,10 @@ public class Start {
 	private Button btnCleanupTriples;
 	private Button btnValidate;
 	private Label lblMessageText;
+	
+	private String rapperPath;
+	private String grepPath;
+	private String virtuosoUrl;
 
 	/**
 	 * Launch the application.
@@ -261,7 +265,7 @@ public class Start {
 			}
 		});
 		btnRemoveTriples.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnRemoveTriples.setBounds(158, 238, 34, 28);
+		btnRemoveTriples.setBounds(158, 214, 34, 28);
 		btnRemoveTriples.setText("...");
 		
 		
@@ -292,25 +296,35 @@ public class Start {
 		
 		btnAddUrls = new Button(grpValidateOutput, SWT.CHECK);
 		btnAddUrls.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		btnAddUrls.setText("Add URLs");
+		btnAddUrls.setText("Add Host URL");
 		btnAddUrls.setBounds(20, 190, 172, 18);
 		
 		btnCleanupTriples = new Button(grpValidateOutput, SWT.CHECK);
 		btnCleanupTriples.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		btnCleanupTriples.setText("Clean-up Triples");
-		btnCleanupTriples.setBounds(20, 242, 132, 18);
+		btnCleanupTriples.setBounds(20, 218, 132, 18);
 		
 		btnValidate = new Button(grpValidateOutput, SWT.CHECK);
 		btnValidate.setSelection(true);
 		btnValidate.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		btnValidate.setText("Validate");
-		btnValidate.setBounds(20, 214, 172, 18);
+		btnValidate.setBounds(20, 248, 172, 18);
 		
 		ProgressBar progressBar = new ProgressBar(grpValidateOutput, SWT.NONE);
 		progressBar.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		progressBar.setBounds(20, 309, 208, 28);
 		
 		Button btnUpload = new Button(grpValidateOutput, SWT.NONE);
+		btnUpload.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					openWebpage(new URI(virtuosoUrl + "/conductor/rdf_import.vspx"));
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		btnUpload.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		btnUpload.setBounds(10, 343, 231, 28);
 		btnUpload.setText("Upload");
@@ -772,6 +786,24 @@ public class Start {
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
+		
+		BufferedReader br2;
+		try {
+			br2 = new BufferedReader(new FileReader("tools.settings"));
+			String line;
+			while ((line = br2.readLine()) != null) {
+				  String[] split = line.split("=",2); 
+				  if (split[0].equals("rapperPath"))
+					  rapperPath = split[1];
+				  else if (split[0].equals("grepPath"))
+					  grepPath = split[1];
+				  else if (split[0].equals("virtuosoUrl"))
+					  virtuosoUrl = split[1];						  
+			}
+			br2.close();		
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 	private String formatSplitInputArg(String input) {
@@ -790,11 +822,11 @@ public class Start {
 	private void startValidation() {	
 		
 		doAddMetadata(btnAddTimestamps.getSelection(), btnAddUrls.getSelection());		
-
-		doRapper();		
 		
 		if (btnCleanupTriples.getSelection()) {
 			doCleanup(cleanupString);
+		
+		doRapper();	
 		}
 	}
 	
@@ -822,7 +854,7 @@ public class Start {
 			String[] cmd = {
 					"/bin/sh",
 					"-c",
-					"/usr/local/bin/rapper -qe -i ntriples -r " + valOutputFile + " > " + valOutputFile + ".tmp"
+					rapperPath + " -qe -i ntriples -r " + valOutputFile + " > " + valOutputFile + ".tmp"
 					};		
 			 String[] cmd2 = {
 					"/bin/sh",
@@ -860,13 +892,13 @@ public class Start {
         String[] cmd1 = {
 					"/bin/sh",
 					"-c",
-					"/usr/bin/grep -Ei " + positives + " " + valOutputFile + " > " + valOutputFile + ".tmp"
+					grepPath + " -Ei " + positives + " " + valOutputFile + " > " + valOutputFile + ".tmp"
 					};	
         
         String[] cmd2 = {
 					"/bin/sh",
 					"-c",
-					"/usr/bin/grep -vEi " + negatives + " " + valOutputFile + ".tmp" + " > " + valOutputFile
+					grepPath + " -vEi " + negatives + " " + valOutputFile + ".tmp" + " > " + valOutputFile
 					};	
         
         String[] cmd3 = {

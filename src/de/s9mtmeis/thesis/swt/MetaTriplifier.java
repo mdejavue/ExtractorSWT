@@ -4,12 +4,13 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.net.URI;
 import java.util.ArrayList;
 
 public class MetaTriplifier {
 
-	private final static String URL_P = "<http://s9mtdev.de/cc/url>";
-	private final static String TIME_P = "<http://s9mtdev.de/cc/time>";
+	private final static String HOST_P = "<http://s9mtmeis.de/cc/host>";
+	private final static String TIME_P = "<http://s9mtmeis.de/cc/time>";
 	
 	public static void triplify(String input, String output, boolean time, boolean url) {
 		BufferedWriter bw;
@@ -34,7 +35,7 @@ public class MetaTriplifier {
 					if (subject.length() > 3 && !subjects.contains(subject)) {				
 						subjects.add(subject);
 						if (url)
-							bw.append(subject + " " + URL_P + " \"" + split[1] + "\" .\n");
+							bw.append(subject + " " + HOST_P + " \"" + new URI(split[1]).getHost() + "\" .\n");
 						
 						if (time)
 							bw.append(subject + " " + TIME_P + " \"" + split[2] + "\" .\n");

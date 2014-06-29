@@ -1,0 +1,3 @@
+rapperPath=/usr/local/bin/rapper
+grepPath=/usr/bin/grep
+virtuosoUrl=http://localhost:8890
