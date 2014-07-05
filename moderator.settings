@@ -8,11 +8,11 @@ numInstances=1
 logUri=s3n://finalprocessing/emr/logs
 jarUri=s3n://finalprocessing/hadoopjob.jar
 mainClass=de.s9mtmeis.jobs.HadoopJob
-outputUri=s3n://finalprocessing/emr/output
+outputUri=s3n://finalprocessing/emr/output2
 extractors=html-rdfa11; html-microdata; html-mf-hproduct; html-mf-hlisting
 matchers=(property|typeof|about|resource)\s*; (itemscope|itemprop\s*=); hproduct; hlisting
-inputUri=s3n://aws-publicdatasets/common-crawl/crawl-data/CC-MAIN-2014-15/segments/1397609521512.15/warc/CC-MAIN-20140416005201-00001-ip-10-147-4-33.ec2.internal.warc.gz
-jobflowId=j-3G1ZHSUB8QBO7
+inputUri=s3n://aws-publicdatasets/common-crawl/crawl-data/CC-MAIN-2014-15/segments/1397609535535.6/warc/CC-MAIN-20140416005215-00409-ip-10-147-4-33.ec2.internal.warc.gz
+jobflowId=j-17M3LT0RSSCB2
 addTimestamps=true
 addUrls=true
 cleanupTriples=true
